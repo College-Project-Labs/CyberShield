@@ -2,23 +2,15 @@ from ml.predict import predict_transaction
 from rag.retriever import retrieve_context
 
 def process_transaction(transaction_data):
-
-    # 1. ML fraud detection
     prediction = predict_transaction(transaction_data)
 
     fraud_score = prediction["fraud_score"]
     status = prediction["status"]
-
-    # 2. Build investigation query
     if status == "suspicious":
         query = "unusual transaction fraud suspicious merchant timing frequency"
     else:
         query = "fraud investigation transaction guidance"
-
-    # 3. Retrieve relevant knowledge
     context = retrieve_context(query)
-
-    # 4. Generate investigation reason
     if status == "suspicious":
         reason = (
             "The machine learning model detected anomalous "
@@ -30,8 +22,6 @@ def process_transaction(transaction_data):
             "The machine learning model did not detect strong "
             "anomalous characteristics."
         )
-
-    # 5. Create incident report
     report = {
         "summary": "Transaction analyzed using CyberShield.",
         "risk_level": status,

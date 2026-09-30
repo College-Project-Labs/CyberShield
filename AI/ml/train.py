@@ -11,7 +11,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OrdinalEncoder
 
-# 1. Load dataset
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 dataset_path = BASE_DIR / "DataSet.csv"
@@ -20,31 +19,22 @@ df = pd.read_csv(dataset_path)
 
 print("Original shape:", df.shape)
 
-# Remove index column
 df = df.drop(columns=["Unnamed: 0"])
 
-# Target
 X = df.drop(columns=["F3924"])
 y = df["F3924"]
 
-# Remove completely empty columns
 X = X.dropna(axis=1, how="all")
 
-# Remove constant columns
 X = X.loc[:, X.nunique(dropna=False) > 1]
 
 print("Final feature shape:", X.shape)
-
-# 2. Identify column types
 
 numeric_features = X.select_dtypes(include=["number"]).columns
 categorical_features = X.select_dtypes(exclude=["number"]).columns
 
 print("Numeric features:", len(numeric_features))
 print("Categorical features:", len(categorical_features))
-
-
-# 3. Preprocessing
 
 numeric_pipeline = Pipeline([
     ("imputer", SimpleImputer(strategy="median"))
@@ -65,8 +55,6 @@ preprocessor = ColumnTransformer([
 
 
 
-# 4. Train/test split
-
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
@@ -77,9 +65,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print("Training samples:", len(X_train))
 print("Testing samples:", len(X_test))
-
-
-# 5. Build model
 
 model = Pipeline([
     ("preprocessor", preprocessor),
@@ -92,15 +77,12 @@ model = Pipeline([
     ))
 ])
 
-# 6. Train
 
 print("\nTraining model...")
 
 model.fit(X_train, y_train)
 
 print("Training complete!")
-
-# 7. Evaluate
 
 predictions = model.predict(X_test)
 probabilities = model.predict_proba(X_test)[:, 1]
@@ -120,7 +102,6 @@ print(
     average_precision_score(y_test, probabilities)
 )
 
-# 8. Save model
 
 model_path = Path(__file__).resolve().parent / "model.pkl"
 

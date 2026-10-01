@@ -1,0 +1,17 @@
+FRAUD PATTERN: Unusual Transaction Amount
+Transactions with unusually high values compared with a user's normal transaction behavior can indicate potential fraud.
+
+FRAUD PATTERN: Unusual Transaction Timing
+Transactions occurring at unusual hours compared with a user's historical behavior may require additional investigation.
+
+FRAUD PATTERN: Unusual Transaction Frequency
+A sudden increase in transaction frequency can be a potential indicator of suspicious activity.
+
+FRAUD PATTERN: Unusual Merchant
+Transactions involving unfamiliar or previously unseen merchants may require additional verification.
+
+FRAUD INVESTIGATION GUIDANCE
+A suspicious transaction should be investigated using multiple signals rather than relying on a single characteristic.
+
+IMPORTANT
+The machine learning model provides an anomaly/fraud score. The score should be combined with transaction context and historical information before generating an investigation report.

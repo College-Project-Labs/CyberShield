@@ -4,10 +4,6 @@ KNOWLEDGE_BASE = Path(__file__).resolve().parent / "knowledge_base"
 
 
 def retrieve_context(query):
-    """
-    Simple keyword-based retrieval from the fraud knowledge base.
-    """
-
     file_path = KNOWLEDGE_BASE / "fraud_patterns.txt"
 
     text = file_path.read_text(encoding="utf-8")

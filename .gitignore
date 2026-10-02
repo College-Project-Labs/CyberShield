@@ -5,3 +5,7 @@ __pycache__/
 
 DataSet.csv
 cybershield.db
+
+*.db
+.venv/
+__pycache__/

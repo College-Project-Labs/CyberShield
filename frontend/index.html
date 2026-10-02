@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CyberShield — Fraud Detection</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-mark">
+                CS
+            </div>
+
+            <div class="brand-name">
+                CyberShield
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <button class="nav-item active" data-section="overview">
+                <span class="nav-icon">01</span>
+                <span>Overview</span>
+            </button>
+
+            <button class="nav-item" data-section="transactions">
+                <span class="nav-icon">02</span>
+                <span>Transactions</span>
+            </button>
+
+            <button class="nav-item" data-section="analysis">
+                <span class="nav-icon">03</span>
+                <span>Analysis</span>
+            </button>
+
+            <button class="nav-item" data-section="activity">
+                <span class="nav-icon">04</span>
+                <span>Activity</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+                <div class="status-dot"></div>
+
+                <div>
+                    <strong>System operational</strong>
+                    <span>Detection engine online</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <span>CYBERSHIELD</span>
+                <span>v1.0.0</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div>
+                <p class="eyebrow">FRAUD INTELLIGENCE</p>
+                <h1>Good afternoon.</h1>
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="last-scan">
+                    <span class="status-dot"></span>
+                    <span>Monitoring live transactions</span>
+                </div>
+
+                <div class="profile">
+                    <div class="profile-avatar">CS</div>
+
+                    <div>
+                        <strong>Security Admin</strong>
+                        <span>Control panel</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- OVERVIEW -->
+        <section id="overview" class="page-section active-section">
+
+            <!-- HERO -->
+            <div class="hero-grid">
+
+                <div class="hero-card">
+
+                    <div class="hero-content">
+
+                        <div>
+                            <p class="eyebrow light">TRANSACTION SECURITY</p>
+
+                            <h2>
+                                Detect risk<br>
+                                before it spreads.
+                            </h2>
+
+                            <p class="hero-description">
+                                CyberShield analyzes transaction behavior,
+                                identifies suspicious patterns and gives
+                                investigators a clear reason behind every alert.
+                            </p>
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            onclick="scrollToAnalyzer()"
+                        >
+                            Analyze transaction
+                            <span>↗</span>
+                        </button>
+
+                    </div>
+
+                    <div class="hero-decoration">
+
+                        <div class="shield-outline">
+                            <div class="shield-core">
+                                CS
+                            </div>
+                        </div>
+
+                        <div class="scan-line"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RISK SCORE -->
+                <div class="risk-card">
+
+                    <div class="card-header">
+                        <span>LIVE RISK INDEX</span>
+
+                        <span class="tiny-label">
+                            24H
+                        </span>
+                    </div>
+
+                    <div class="risk-score">
+                        <span id="globalRisk">18</span>
+                        <small>/100</small>
+                    </div>
+
+                    <div class="risk-bar">
+                        <div
+                            id="globalRiskBar"
+                            class="risk-bar-fill"
+                        ></div>
+                    </div>
+
+                    <div class="risk-footer">
+                        <span>Current exposure</span>
+                        <strong id="riskLabel">Low</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STAT CARDS -->
+            <div class="stats-grid">
+
+                <div class="stat-card lime-card">
+
+                    <div class="stat-top">
+                        <span>Transactions</span>
+                        <span class="stat-index">01</span>
+                    </div>
+
+                    <strong id="transactionCount">
+                        1,284
+                    </strong>
+
+                    <p>
+                        Processed today
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card purple-card">
+
+                    <div class="stat-top">
+                        <span>Flagged</span>
+                        <span class="stat-index">02</span>
+                    </div>
+
+                    <strong id="flaggedCount">
+                        42
+                    </strong>
+
+                    <p>
+                        Require investigation
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card coral-card">
+
+                    <div class="stat-top">
+                        <span>High risk</span>
+                        <span class="stat-index">03</span>
+                    </div>
+
+                    <strong id="highRiskCount">
+                        08
+                    </strong>
+
+                    <p>
+                        Immediate attention
+                    </p>
+
+                </div>
+
+
+                <div class="stat-card blue-card">
+
+                    <div class="stat-top">
+                        <span>Accuracy</span>
+                        <span class="stat-index">04</span>
+                    </div>
+
+                    <strong>
+                        97.8%
+                    </strong>
+
+                    <p>
+                        Model confidence
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ANALYZER -->
+            <div
+                id="analyzer"
+                class="content-grid"
+            >
+
+                <div class="panel analyzer-panel">
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <p class="eyebrow">REAL-TIME ANALYSIS</p>
+                            <h3>Analyze a transaction</h3>
+                        </div>
+
+                        <span class="panel-number">
+                            01
+                        </span>
+
+                    </div>
+
+
+                    <form id="transactionForm">
+
+                        <div class="form-grid">
+
+                            <div class="field">
+                                <label>Merchant ID</label>
+
+                                <input
+                                    type="text"
+                                    id="merchantId"
+                                    placeholder="MER-1048"
+                                    value="MER-1048"
+                                    required
+                                >
+                            </div>
+
+
+                            <div class="field">
+                                <label>Amount</label>
+
+                                <div class="input-with-prefix">
+                                    <span>$</span>
+
+                                    <input
+                                        type="number"
+                                        id="amount"
+                                        placeholder="250.00"
+                                        value="250"
+                                        min="0"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+
+                            <div class="field">
+                                <label>Location</label>
+
+                                <input
+                                    type="text"
+                                    id="location"
+                                    placeholder="Indore, IN"
+                                    value="Indore, IN"
+                                >
+                            </div>
+
+
+                            <div class="field">
+                                <label>Merchant type</label>
+
+                                <select id="merchantType">
+
+                                    <option value="retail">
+                                        Retail
+                                    </option>
+
+                                    <option value="food">
+                                        Food & Dining
+                                    </option>
+
+                                    <option value="travel">
+                                        Travel
+                                    </option>
+
+                                    <option value="electronics">
+                                        Electronics
+                                    </option>
+
+                                    <option value="digital">
+                                        Digital Services
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="analyze-button"
+                        >
+                            <span>Run security analysis</span>
+                            <span class="button-arrow">→</span>
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- RESULT -->
+                <div
+                    id="resultPanel"
+                    class="panel result-panel"
+                >
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <p class="eyebrow">DETECTION RESULT</p>
+                            <h3 id="resultTitle">
+                                Awaiting analysis
+                            </h3>
+                        </div>
+
+                        <span
+                            id="resultBadge"
+                            class="result-badge neutral"
+                        >
+                            READY
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-display">
+
+                        <div
+                            id="transactionScore"
+                            class="transaction-score"
+                        >
+                            —
+                        </div>
+
+                        <div>
+                            <span class="score-label">
+                                Fraud probability
+                            </span>
+
+                            <span
+                                id="transactionStatus"
+                                class="score-status"
+                            >
+                                Run an analysis
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="explanation-box">
+
+                        <span class="explanation-label">
+                            SYSTEM EXPLANATION
+                        </span>
+
+                        <p id="explanation">
+                            Submit a transaction to generate a
+                            risk assessment and explanation.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-list">
+
+                        <div class="feature-item">
+
+                            <span>Amount behavior</span>
+
+                            <strong id="amountSignal">
+                                —
+                            </strong>
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <span>Merchant pattern</span>
+
+                            <strong id="merchantSignal">
+                                —
+                            </strong>
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <span>Location signal</span>
+
+                            <strong id="locationSignal">
+                                —
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOWER CONTENT -->
+            <div class="lower-grid">
+
+                <!-- TRANSACTIONS -->
+                <div class="panel transactions-panel">
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <p class="eyebrow">RECENT ACTIVITY</p>
+                            <h3>Transactions</h3>
+                        </div>
+
+                        <button
+                            class="text-button"
+                            onclick="showAllTransactions()"
+                        >
+                            View all →
+                        </button>
+
+                    </div>
+
+
+                    <div class="transaction-table">
+
+                        <div class="table-head">
+                            <span>Merchant</span>
+                            <span>Amount</span>
+                            <span>Risk</span>
+                            <span>Status</span>
+                        </div>
+
+                        <div id="transactionRows">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- DISTRIBUTION -->
+                <div class="panel distribution-panel">
+
+                    <div class="panel-heading">
+
+                        <div>
+                            <p class="eyebrow">RISK DISTRIBUTION</p>
+                            <h3>Current exposure</h3>
+                        </div>
+
+                    </div>
+
+
+                    <div class="distribution">
+
+                        <div class="donut">
+
+                            <div class="donut-inner">
+                                <strong>94%</strong>
+                                <span>Safe</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="distribution-legend">
+
+                            <div>
+                                <span class="legend-dot safe"></span>
+                                <span>Safe</span>
+                                <strong>94%</strong>
+                            </div>
+
+                            <div>
+                                <span class="legend-dot review"></span>
+                                <span>Review</span>
+                                <strong>4%</strong>
+                            </div>
+
+                            <div>
+                                <span class="legend-dot danger"></span>
+                                <span>High risk</span>
+                                <strong>2%</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- TRANSACTIONS SECTION -->
+        <section
+            id="transactions"
+            class="page-section"
+        >
+
+            <div class="section-title">
+                <p class="eyebrow">TRANSACTION CENTER</p>
+                <h2>All transactions</h2>
+                <p>
+                    Review recent transaction activity and detected risk.
+                </p>
+            </div>
+
+            <div class="panel full-panel">
+
+                <div id="fullTransactions"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYSIS SECTION -->
+        <section
+            id="analysis"
+            class="page-section"
+        >
+
+            <div class="section-title">
+                <p class="eyebrow">MODEL INTELLIGENCE</p>
+                <h2>Detection analysis</h2>
+                <p>
+                    Understand the signals contributing to fraud detection.
+                </p>
+            </div>
+
+            <div class="analysis-grid">
+
+                <div class="analysis-card dark-analysis">
+
+                    <span class="eyebrow light">
+                        MODEL
+                    </span>
+
+                    <h3>
+                        Fraud detection engine
+                    </h3>
+
+                    <strong>
+                        ACTIVE
+                    </strong>
+
+                    <p>
+                        The detection pipeline evaluates transaction
+                        behavior and produces a probability score
+                        between 0 and 1.
+                    </p>
+
+                </div>
+
+
+                <div class="analysis-card">
+
+                    <span class="eyebrow">
+                        SIGNALS
+                    </span>
+
+                    <h3>
+                        Detection factors
+                    </h3>
+
+                    <div class="signal-bars">
+
+                        <div>
+                            <span>Amount</span>
+                            <div class="mini-bar">
+                                <i style="width: 78%"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span>Frequency</span>
+                            <div class="mini-bar">
+                                <i style="width: 62%"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span>Location</span>
+                            <div class="mini-bar">
+                                <i style="width: 48%"></i>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span>Merchant</span>
+                            <div class="mini-bar">
+                                <i style="width: 71%"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ACTIVITY -->
+        <section
+            id="activity"
+            class="page-section"
+        >
+
+            <div class="section-title">
+                <p class="eyebrow">SYSTEM ACTIVITY</p>
+                <h2>Detection activity</h2>
+                <p>
+                    Recent events generated by the security pipeline.
+                </p>
+            </div>
+
+            <div class="panel full-panel">
+
+                <div class="activity-list">
+
+                    <div class="activity-item">
+                        <span class="activity-time">14:42</span>
+                        <div>
+                            <strong>Transaction analyzed</strong>
+                            <p>MER-1048 · $250.00</p>
+                        </div>
+                        <span class="activity-status safe-text">
+                            LOW RISK
+                        </span>
+                    </div>
+
+                    <div class="activity-item">
+                        <span class="activity-time">14:37</span>
+                        <div>
+                            <strong>Transaction flagged</strong>
+                            <p>MER-7731 · Unusual amount pattern</p>
+                        </div>
+                        <span class="activity-status review-text">
+                            REVIEW
+                        </span>
+                    </div>
+
+                    <div class="activity-item">
+                        <span class="activity-time">14:29</span>
+                        <div>
+                            <strong>Model analysis completed</strong>
+                            <p>1,284 transactions processed</p>
+                        </div>
+                        <span class="activity-status safe-text">
+                            COMPLETE
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

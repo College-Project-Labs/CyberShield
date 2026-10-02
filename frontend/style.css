@@ -1239,7 +1239,266 @@ button {
         display: none;
     }
 }
-\n\n/* =========================================================\n   CYBERSHIELD HERO — LIVE THREAT NETWORK\n   ========================================================= */\n\n.cyber-hero {\n    position: relative;\n    min-height: 420px;\n    overflow: hidden;\n    background: #102733;\n}\n\n.cyber-grid {\n    position: absolute;\n    inset: 0;\n    background-image:\n        linear-gradient(rgba(217,255,63,.055) 1px, transparent 1px),\n        linear-gradient(90deg, rgba(217,255,63,.055) 1px, transparent 1px);\n    background-size: 38px 38px;\n    mask-image: linear-gradient(90deg, black 0%, black 48%, transparent 100%);\n    opacity: .8;\n    animation: gridMove 18s linear infinite;\n}\n\n@keyframes gridMove {\n    from { transform: translateY(0); }\n    to { transform: translateY(38px); }\n}\n\n.cyber-live {\n    position: relative;\n    z-index: 10;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    margin-bottom: 20px;\n    padding: 7px 10px;\n    border: 1px solid rgba(217,255,63,.18);\n    border-radius: 999px;\n    background: rgba(217,255,63,.07);\n    color: #D9FF3F;\n    font-size: 8px;\n    font-weight: 800;\n    letter-spacing: .13em;\n}\n\n.live-dot {\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background: #D9FF3F;\n    animation: livePulse 1.8s infinite;\n}\n\n@keyframes livePulse {\n    0%, 100% { box-shadow: 0 0 0 0 rgba(217,255,63,.55); }\n    70% { box-shadow: 0 0 0 7px rgba(217,255,63,0); }\n}\n\n.cyber-hero .hero-content {\n    position: relative;\n    z-index: 10;\n    max-width: 650px;\n}\n\n.cyber-hero .hero-content h2 {\n    max-width: 650px;\n}\n\n.cyber-hero .hero-description {\n    max-width: 540px;\n}\n\n.cyber-network {\n    position: absolute;\n    z-index: 5;\n    right: 35px;\n    top: 50%;\n    width: 320px;\n    height: 300px;\n    transform: translateY(-50%);\n    padding: 17px;\n    border: 1px solid rgba(247,245,240,.12);\n    border-radius: 24px;\n    background: rgba(5,5,5,.18);\n    backdrop-filter: blur(10px);\n    box-shadow: 0 25px 70px rgba(0,0,0,.22);\n    transition: transform .18s ease-out;\n}\n\n.network-header,\n.network-footer {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n}\n\n.network-header {\n    color: rgba(247,245,240,.48);\n    font-size: 8px;\n    font-weight: 800;\n    letter-spacing: .14em;\n}\n\n.network-live,\n.network-footer strong {\n    color: #D9FF3F;\n}\n\n.network-stage {\n    position: relative;\n    height: 224px;\n}\n\n.network-line {\n    position: absolute;\n    height: 1px;\n    transform-origin: left center;\n    background: linear-gradient(90deg, rgba(217,255,63,.04), rgba(217,255,63,.55), rgba(146,117,232,.12));\n}\n\n.line-a { width: 140px; left: 45px; top: 79px; transform: rotate(20deg); }\n.line-b { width: 130px; left: 62px; top: 157px; transform: rotate(-20deg); }\n.line-c { width: 140px; right: 43px; top: 79px; transform: rotate(160deg); }\n.line-d { width: 130px; right: 61px; top: 157px; transform: rotate(200deg); }\n\n.network-node {\n    position: absolute;\n    width: 9px;\n    height: 9px;\n    border-radius: 50%;\n    background: #D9FF3F;\n    box-shadow: 0 0 16px rgba(217,255,63,.8);\n    animation: nodePulse 2.4s ease-in-out infinite;\n}\n\n.node-a { left: 42px; top: 76px; }\n.node-b { left: 59px; top: 153px; background: #8DCCE7; }\n.node-c { right: 40px; top: 76px; background: #9275E8; }\n.node-d { right: 58px; top: 153px; background: #FF6B57; }\n\n@keyframes nodePulse {\n    0%, 100% { transform: scale(1); opacity: .65; }\n    50% { transform: scale(1.5); opacity: 1; }\n}\n\n.network-core {\n    position: absolute;\n    left: 50%;\n    top: 50%;\n    width: 86px;\n    height: 86px;\n    transform: translate(-50%, -50%);\n    display: grid;\n    place-items: center;\n    border-radius: 50%;\n    background: #D9FF3F;\n    color: #102733;\n    box-shadow: 0 0 0 10px rgba(217,255,63,.05), 0 0 45px rgba(217,255,63,.25);\n    animation: coreFloat 3s ease-in-out infinite;\n}\n\n.network-core strong {\n    position: relative;\n    z-index: 3;\n    font-size: 18px;\n    letter-spacing: -.08em;\n}\n\n.core-ring {\n    position: absolute;\n    inset: -12px;\n    border: 1px solid rgba(217,255,63,.35);\n    border-radius: 50%;\n    animation: ringRotate 7s linear infinite;\n}\n\n.core-ring::after {\n    content: "";\n    position: absolute;\n    width: 7px;\n    height: 7px;\n    right: 7px;\n    top: 12px;\n    border-radius: 50%;\n    background: #FF6B57;\n}\n\n@keyframes coreFloat {\n    0%, 100% { transform: translate(-50%, -50%) translateY(0); }\n    50% { transform: translate(-50%, -50%) translateY(-7px); }\n}\n\n@keyframes ringRotate {\n    from { transform: rotate(0deg); }\n    to { transform: rotate(360deg); }\n}\n\n.scan-beam {\n    position: absolute;\n    left: 22px;\n    width: 275px;\n    height: 1px;\n    background: #D9FF3F;\n    box-shadow: 0 0 12px rgba(217,255,63,.9);\n    animation: scanBeam 3.2s ease-in-out infinite;\n}\n\n@keyframes scanBeam {\n    0% { top: 28px; opacity: 0; }\n    15% { opacity: 1; }\n    50% { opacity: 1; }\n    85% { opacity: 1; }\n    100% { top: 195px; opacity: 0; }\n}\n\n.network-footer {\n    color: rgba(247,245,240,.35);\n    font-size: 7px;\n    font-weight: 800;\n    letter-spacing: .13em;\n}\n\n.cyber-particle {\n    position: absolute;\n    z-index: 3;\n    width: 4px;\n    height: 4px;\n    border-radius: 50%;\n    background: #D9FF3F;\n    animation: particleFloat 5s ease-in-out infinite;\n}\n\n.p1 { right: 43%; top: 18%; }\n.p2 { right: 18%; top: 30%; background: #9275E8; animation-delay: 1s; }\n.p3 { right: 38%; bottom: 17%; background: #8DCCE7; animation-delay: 2s; }\n.p4 { right: 8%; bottom: 20%; background: #FF6B57; animation-delay: 1.5s; }\n.p5 { right: 28%; top: 12%; animation-delay: 3s; }\n\n@keyframes particleFloat {\n    0%, 100% { transform: translate(0,0); opacity: .25; }\n    50% { transform: translate(-10px,-18px); opacity: 1; }\n}\n\n@media (max-width: 1100px) {\n    .cyber-network { right: 15px; width: 290px; opacity: .9; }\n    .cyber-hero .hero-content { max-width: 58%; }\n}\n\n@media (max-width: 850px) {\n    .cyber-network { opacity: .25; right: -50px; }\n    .cyber-hero .hero-content { max-width: 100%; }\n}\n\n@media (max-width: 560px) {\n    .cyber-network { display: none; }\n    .cyber-hero .hero-content { max-width: 100%; }\n}\n
+
+
+/* =========================================================
+   CYBERSHIELD HERO — LIVE THREAT NETWORK
+   ========================================================= */
+
+.cyber-hero {
+    position: relative;
+    min-height: 420px;
+    overflow: hidden;
+    background: #102733;
+}
+
+.cyber-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(217,255,63,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(217,255,63,.055) 1px, transparent 1px);
+    background-size: 38px 38px;
+    mask-image: linear-gradient(90deg, black 0%, black 48%, transparent 100%);
+    opacity: .8;
+    animation: gridMove 18s linear infinite;
+}
+
+@keyframes gridMove {
+    from { transform: translateY(0); }
+    to { transform: translateY(38px); }
+}
+
+.cyber-live {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 7px 10px;
+    border: 1px solid rgba(217,255,63,.18);
+    border-radius: 999px;
+    background: rgba(217,255,63,.07);
+    color: #D9FF3F;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+
+.live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #D9FF3F;
+    animation: livePulse 1.8s infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,255,63,.55); }
+    70% { box-shadow: 0 0 0 7px rgba(217,255,63,0); }
+}
+
+.cyber-hero .hero-content {
+    position: relative;
+    z-index: 10;
+    max-width: 650px;
+}
+
+.cyber-hero .hero-content h2 {
+    max-width: 650px;
+}
+
+.cyber-hero .hero-description {
+    max-width: 540px;
+}
+
+.cyber-network {
+    position: absolute;
+    z-index: 5;
+    right: 35px;
+    top: 50%;
+    width: 320px;
+    height: 300px;
+    transform: translateY(-50%);
+    padding: 17px;
+    border: 1px solid rgba(247,245,240,.12);
+    border-radius: 24px;
+    background: rgba(5,5,5,.18);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 25px 70px rgba(0,0,0,.22);
+    transition: transform .18s ease-out;
+}
+
+.network-header,
+.network-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.network-header {
+    color: rgba(247,245,240,.48);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+.network-live,
+.network-footer strong {
+    color: #D9FF3F;
+}
+
+.network-stage {
+    position: relative;
+    height: 224px;
+}
+
+.network-line {
+    position: absolute;
+    height: 1px;
+    transform-origin: left center;
+    background: linear-gradient(90deg, rgba(217,255,63,.04), rgba(217,255,63,.55), rgba(146,117,232,.12));
+}
+
+.line-a { width: 140px; left: 45px; top: 79px; transform: rotate(20deg); }
+.line-b { width: 130px; left: 62px; top: 157px; transform: rotate(-20deg); }
+.line-c { width: 140px; right: 43px; top: 79px; transform: rotate(160deg); }
+.line-d { width: 130px; right: 61px; top: 157px; transform: rotate(200deg); }
+
+.network-node {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #D9FF3F;
+    box-shadow: 0 0 16px rgba(217,255,63,.8);
+    animation: nodePulse 2.4s ease-in-out infinite;
+}
+
+.node-a { left: 42px; top: 76px; }
+.node-b { left: 59px; top: 153px; background: #8DCCE7; }
+.node-c { right: 40px; top: 76px; background: #9275E8; }
+.node-d { right: 58px; top: 153px; background: #FF6B57; }
+
+@keyframes nodePulse {
+    0%, 100% { transform: scale(1); opacity: .65; }
+    50% { transform: scale(1.5); opacity: 1; }
+}
+
+.network-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 86px;
+    height: 86px;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #D9FF3F;
+    color: #102733;
+    box-shadow: 0 0 0 10px rgba(217,255,63,.05), 0 0 45px rgba(217,255,63,.25);
+    animation: coreFloat 3s ease-in-out infinite;
+}
+
+.network-core strong {
+    position: relative;
+    z-index: 3;
+    font-size: 18px;
+    letter-spacing: -.08em;
+}
+
+.core-ring {
+    position: absolute;
+    inset: -12px;
+    border: 1px solid rgba(217,255,63,.35);
+    border-radius: 50%;
+    animation: ringRotate 7s linear infinite;
+}
+
+.core-ring::after {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    right: 7px;
+    top: 12px;
+    border-radius: 50%;
+    background: #FF6B57;
+}
+
+@keyframes coreFloat {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-7px); }
+}
+
+@keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.scan-beam {
+    position: absolute;
+    left: 22px;
+    width: 275px;
+    height: 1px;
+    background: #D9FF3F;
+    box-shadow: 0 0 12px rgba(217,255,63,.9);
+    animation: scanBeam 3.2s ease-in-out infinite;
+}
+
+@keyframes scanBeam {
+    0% { top: 28px; opacity: 0; }
+    15% { opacity: 1; }
+    50% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 195px; opacity: 0; }
+}
+
+.network-footer {
+    color: rgba(247,245,240,.35);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+
+.cyber-particle {
+    position: absolute;
+    z-index: 3;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #D9FF3F;
+    animation: particleFloat 5s ease-in-out infinite;
+}
+
+.p1 { right: 43%; top: 18%; }
+.p2 { right: 18%; top: 30%; background: #9275E8; animation-delay: 1s; }
+.p3 { right: 38%; bottom: 17%; background: #8DCCE7; animation-delay: 2s; }
+.p4 { right: 8%; bottom: 20%; background: #FF6B57; animation-delay: 1.5s; }
+.p5 { right: 28%; top: 12%; animation-delay: 3s; }
+
+@keyframes particleFloat {
+    0%, 100% { transform: translate(0,0); opacity: .25; }
+    50% { transform: translate(-10px,-18px); opacity: 1; }
+}
+
+@media (max-width: 1100px) {
+    .cyber-network { right: 15px; width: 290px; opacity: .9; }
+    .cyber-hero .hero-content { max-width: 58%; }
+}
+
+@media (max-width: 850px) {
+    .cyber-network { opacity: .25; right: -50px; }
+    .cyber-hero .hero-content { max-width: 100%; }
+}
+
+@media (max-width: 560px) {
+    .cyber-network { display: none; }
+    .cyber-hero .hero-content { max-width: 100%; }
+}
+
 
 /* =========================================================
    FINAL HERO POLISH — SIMPLE / GREEN / FINTECH

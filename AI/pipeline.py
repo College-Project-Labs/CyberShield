@@ -6,17 +6,13 @@ from agent.assistant import investigate_transaction
 def process_transaction(transaction_data):
 
     prediction = predict_transaction(transaction_data)
-
     fraud_score = prediction["fraud_score"]
     status = prediction["status"]
-
     query = (
         "unusual transaction fraud suspicious "
         "merchant timing frequency"
     )
     context = retrieve_context(query)
-
-    # 4. AI investigation
     investigation = investigate_transaction(
         transaction_data,
         prediction,

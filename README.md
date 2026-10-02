@@ -4,12 +4,12 @@
 
 Built for the PSBs Hackathon (Bank of India × IIT Hyderabad).
 
-CyberShield scores financial transactions for fraud risk, flags suspicious activity, and adds investigation context on top of the ML prediction. A FastAPI backend serves the model, stores results in SQLite, and feeds a web dashboard.
+CyberShield scores financial transactions for fraud risk, flags suspicious activity, and adds investigation context on top of the ML prediction. A single FastAPI application serves the REST API, runs the AI pipeline, stores results in SQLite, and hosts the web dashboard.
 
 <!-- TODO: add a screenshot or GIF of the dashboard here -->
 <!-- ![Dashboard](docs/dashboard.png) -->
 
-**Live demo:** _add Vercel / deployed link here_
+**Live demo:** _add Render link here_
 
 ---
 
@@ -20,7 +20,7 @@ CyberShield scores financial transactions for fraud risk, flags suspicious activ
 - **AI investigation layer**: combines the ML prediction with retrieved fraud-pattern knowledge (RAG) to produce reasoning and a recommendation
 - **Persistence**: every scored transaction is stored in SQLite
 - **Alerts endpoint**: quickly list only the flagged transactions
-- **Dashboard**: static web UI that talks to the REST API
+- **Dashboard**: web UI served directly by FastAPI, no separate frontend server
 - **Auto-generated API docs** via Swagger at `/docs`
 
 ---
@@ -28,16 +28,20 @@ CyberShield scores financial transactions for fraud risk, flags suspicious activ
 ## Architecture
 
 ```text
- Web Frontend (HTML / CSS / JS)
-            │  REST
-            ▼
- FastAPI Backend ──────────► SQLite
-            │
-            ▼
- AI Pipeline
-   ├─ ML prediction      (scikit-learn model)
-   ├─ RAG retrieval      (fraud-pattern knowledge base)
-   └─ AI investigation   (reasoning + recommendation)
+ Browser
+    │
+    ▼
+ FastAPI application (single service)
+    ├─ Static dashboard   (HTML / CSS / JS, served at /)
+    ├─ REST API           (/transaction, /transactions, /alerts, ...)
+    │        │
+    │        ▼
+    │   AI Pipeline
+    │     ├─ ML prediction      (scikit-learn model)
+    │     ├─ RAG retrieval      (fraud-pattern knowledge base)
+    │     └─ AI investigation   (reasoning + recommendation)
+    │
+    └─ SQLite database
 ```
 
 **Request flow:** transaction → feature preparation → ML model → fraud probability → risk classification → AI investigation → saved to DB → returned to client.
@@ -48,10 +52,11 @@ CyberShield scores financial transactions for fraud risk, flags suspicious activ
 
 | Layer | Tools |
 |---|---|
-| Frontend | HTML, CSS, JavaScript |
-| Backend | Python, FastAPI, Uvicorn, SQLAlchemy, SQLite |
+| Application | Python, FastAPI, Uvicorn |
+| Database | SQLAlchemy, SQLite |
 | ML | scikit-learn (Random Forest), Pandas, Joblib |
 | AI pipeline | ML prediction, RAG retrieval, investigation layer |
+| Dashboard | HTML, CSS, JavaScript (served via FastAPI `StaticFiles`) |
 
 ---
 
@@ -72,7 +77,7 @@ CyberShield/
 │       └── knowledge_base/
 │           └── fraud_patterns.txt
 ├── app/
-│   ├── main.py                  # FastAPI app + routes
+│   ├── main.py                  # FastAPI app, routes, serves the dashboard
 │   ├── database.py              # DB engine / session
 │   ├── model.py                 # SQLAlchemy models
 │   ├── schemas.py               # Pydantic schemas
@@ -82,6 +87,7 @@ CyberShield/
 │   ├── app.js
 │   └── style.css
 ├── DataSet.csv
+├── requirements.txt
 └── README.md
 ```
 
@@ -113,12 +119,12 @@ source .venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
-pip install fastapi uvicorn sqlalchemy pandas joblib scikit-learn==1.7.2
+pip install -r requirements.txt
 ```
 
 > `scikit-learn` is pinned to `1.7.2` so it matches the version used to train `model.pkl`.
 
-### 4. Run the backend
+### 4. Run the app
 
 ```bash
 uvicorn app.main:app --reload
@@ -126,17 +132,11 @@ uvicorn app.main:app --reload
 
 | URL | Purpose |
 |---|---|
-| `http://127.0.0.1:8000` | API root |
+| `http://127.0.0.1:8000` | Dashboard |
 | `http://127.0.0.1:8000/docs` | Swagger UI |
 | `http://127.0.0.1:8000/health` | Health check |
 
-The SQLite database (`cybershield.db`) is created automatically on first run.
-
-### 5. Run the frontend
-
-The frontend is static. Open `frontend/index.html` with **VS Code Live Server** (usually `http://127.0.0.1:5500/frontend/index.html`).
-
-Make sure the API base URL in `frontend/app.js` points to your backend (`http://127.0.0.1:8000` locally).
+One command runs everything. The SQLite database (`cybershield.db`) is created automatically on first run, and the dashboard calls the API on the same origin, so no extra configuration is needed.
 
 ---
 
@@ -182,23 +182,9 @@ python AI/ml/train.py
 
 ---
 
-## CORS
-
-For local development the backend allows these origins:
-
-```text
-http://localhost:5173
-http://localhost:5500
-http://127.0.0.1:5500
-```
-
-Add your deployed frontend URL to the CORS config in `app/main.py` before deploying.
-
----
-
 ## Testing
 
-Use Swagger at `/docs`, in this order:
+Open the dashboard at `/`, or use Swagger at `/docs` in this order:
 
 1. `GET /health`
 2. `POST /transaction`
@@ -209,9 +195,19 @@ Use Swagger at `/docs`, in this order:
 
 ## Deployment
 
-- **Frontend:** deploy the `frontend/` folder as a static site (e.g. Vercel).
-- **Backend:** needs a Python host (e.g. Render, Railway). Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Change the API base URL in `frontend/app.js` from `http://127.0.0.1:8000` to the deployed backend URL, and add the frontend origin to CORS.
+CyberShield deploys as a **single web service**, so the API and dashboard share one URL.
+
+**Render** (or any Python host such as Railway):
+
+| Setting | Value |
+|---|---|
+| Build command | `pip install -r requirements.txt` |
+| Start command | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+
+Notes:
+- Make sure `AI/ml/model.pkl` and the RAG knowledge base files are committed, since the service needs them at runtime.
+- The dashboard uses relative API URLs, so nothing changes between local and deployed.
+- On free hosting tiers the SQLite file is reset on each redeploy, so demo data should be seeded on startup.
 
 ---
 
@@ -231,9 +227,12 @@ Use Swagger at `/docs`, in this order:
 
 | Name | Role |
 |---|---|
-|PRAKRATI SAXENA| Backend, API, frontend integration |
-| KUMKUM NATH | ML model, AI pipeline |
+| Prakrati Saxena| Backend, API, dashboard integration |
+| Kumkum Nath| ML model, AI pipeline |
 
 ---
 
+## License
+
+_Add a license (e.g. MIT) or remove this section._
 

@@ -7,7 +7,7 @@ Built for the PSBs Hackathon (Bank of India × IIT Hyderabad).
 CyberShield scores financial transactions for fraud risk, flags suspicious activity, and adds investigation context on top of the ML prediction. A single FastAPI application serves the REST API, runs the AI pipeline, stores results in SQLite, and hosts the web dashboard.
 
 
-**Live demo:** 
+**Live demo:** https://cyber-shield-navy-alpha.vercel.app/
 
 ---
 

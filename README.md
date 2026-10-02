@@ -6,10 +6,8 @@ Built for the PSBs Hackathon (Bank of India × IIT Hyderabad).
 
 CyberShield scores financial transactions for fraud risk, flags suspicious activity, and adds investigation context on top of the ML prediction. A single FastAPI application serves the REST API, runs the AI pipeline, stores results in SQLite, and hosts the web dashboard.
 
-<!-- TODO: add a screenshot or GIF of the dashboard here -->
-<!-- ![Dashboard](docs/dashboard.png) -->
 
-**Live demo:** _add Render link here_
+**Live demo:** 
 
 ---
 
@@ -232,7 +230,4 @@ Notes:
 
 ---
 
-## License
-
-_Add a license (e.g. MIT) or remove this section._
 

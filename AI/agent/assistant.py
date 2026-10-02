@@ -4,7 +4,6 @@ def investigate_transaction(transaction_data, prediction, context):
     status = prediction["status"]
 
     if status == "suspicious":
-
         reason = (
             f"CyberShield detected an anomalous transaction with a "
             f"fraud score of {fraud_score}. The transaction should be "
@@ -18,7 +17,6 @@ def investigate_transaction(transaction_data, prediction, context):
             "Review the transaction against the user's historical "
             "behavior and verify the merchant and transaction details."
         )
-
     else:
 
         reason = (

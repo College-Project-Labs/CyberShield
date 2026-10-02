@@ -1,8 +1,6 @@
-from ml.predict import predict_transaction
-from rag.retriever import retrieve_context
-from agent.assistant import investigate_transaction
-
-
+from AI.ml.predict import predict_transaction
+from AI.rag.retriever import retrieve_context
+from AI.agent.assistant import investigate_transaction
 def process_transaction(transaction_data):
 
     prediction = predict_transaction(transaction_data)

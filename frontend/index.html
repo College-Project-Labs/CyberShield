@@ -19,7 +19,7 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/frontend/style.css">
 </head>
 
 <body>
@@ -122,48 +122,98 @@
             <!-- HERO -->
             <div class="hero-grid">
 
-                <div class="hero-card">
+                <div class="hero-card cyber-hero">
 
-                    <div class="hero-content">
+    <div class="hero-content">
 
-                        <div>
-                            <p class="eyebrow light">TRANSACTION SECURITY</p>
+        <div>
 
-                            <h2>
-                                Detect risk<br>
-                                before it spreads.
-                            </h2>
+            <div class="cyber-live">
+                <span class="live-dot"></span>
+                LIVE MONITORING
+            </div>
 
-                            <p class="hero-description">
-                                CyberShield analyzes transaction behavior,
-                                identifies suspicious patterns and gives
-                                investigators a clear reason behind every alert.
-                            </p>
-                        </div>
+            <p class="eyebrow light">
+                TRANSACTION SECURITY
+            </p>
 
-                        <button
-                            class="primary-button"
-                            onclick="scrollToAnalyzer()"
-                        >
-                            Analyze transaction
-                            <span>↗</span>
-                        </button>
+            <h2>
+                Detect risk<br>
+                before it spreads.
+            </h2>
 
-                    </div>
+            <p class="hero-description">
+                CyberShield analyzes transaction behavior,
+                identifies suspicious patterns and gives
+                investigators a clear reason behind every alert.
+            </p>
 
-                    <div class="hero-decoration">
+        </div>
 
-                        <div class="shield-outline">
-                            <div class="shield-core">
-                                CS
-                            </div>
-                        </div>
+        <button
+            class="primary-button"
+            type="button"
+            onclick="scrollToAnalyzer()"
+        >
+            Analyze transaction
+            <span>↗</span>
+        </button>
 
-                        <div class="scan-line"></div>
+    </div>
 
-                    </div>
 
-                </div>
+    <!-- SIMPLE LIVE SECURITY CARD -->
+
+    <div class="hero-security-card">
+
+        <div class="hero-security-top">
+            <span>THREAT ENGINE</span>
+
+            <span class="hero-security-live">
+                <i></i> LIVE
+            </span>
+        </div>
+
+
+        <div class="hero-security-core">
+
+            <div class="hero-core-ring"></div>
+
+            <div class="hero-core">
+                <span>CS</span>
+            </div>
+
+        </div>
+
+
+        <div class="hero-security-title">
+            <strong>Protection active</strong>
+            <span>Scanning transaction signals</span>
+        </div>
+
+
+        <div class="hero-security-stats">
+
+            <div>
+                <strong>24/7</strong>
+                <span>MONITORING</span>
+            </div>
+
+            <div>
+                <strong>ML</strong>
+                <span>ANALYSIS</span>
+            </div>
+
+            <div>
+                <strong>LIVE</strong>
+                <span>DETECTION</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
                 <!-- RISK SCORE -->
@@ -378,7 +428,7 @@
 
 
                         <button
-                            type="submit"
+                            type="button"
                             class="analyze-button"
                         >
                             <span>Run security analysis</span>
@@ -622,78 +672,139 @@
             <div class="section-title">
                 <p class="eyebrow">MODEL INTELLIGENCE</p>
                 <h2>Detection analysis</h2>
-                <p>
-                    Understand the signals contributing to fraud detection.
-                </p>
+                <p>Understand the transaction context evaluated by CyberShield.</p>
             </div>
 
-            <div class="analysis-grid">
+            <div class="analysis-grid cyber-analysis-grid">
 
-                <div class="analysis-card dark-analysis">
+                <!-- MODEL CARD -->
+                <div class="analysis-card cyber-model-card">
 
-                    <span class="eyebrow light">
-                        MODEL
-                    </span>
+                    <div class="cyber-card-top">
+                        <span class="cyber-label">MODEL</span>
 
-                    <h3>
-                        Fraud detection engine
-                    </h3>
+                        <span class="cyber-status">
+                            <span class="cyber-status-dot"></span>
+                            ACTIVE
+                        </span>
+                    </div>
 
-                    <strong>
-                        ACTIVE
-                    </strong>
+                    <div class="cyber-model-icon">↗</div>
 
-                    <p>
-                        The detection pipeline evaluates transaction
-                        behavior and produces a probability score
-                        between 0 and 1.
-                    </p>
+                    <div>
+                        <h3>Fraud detection engine</h3>
+
+                        <p class="cyber-model-description">
+                            CyberShield evaluates transaction information
+                            through the detection pipeline and produces
+                            a fraud-risk score.
+                        </p>
+                    </div>
+
+                    <div class="cyber-model-footer">
+                        <span>REAL-TIME</span>
+                        <span>ML PIPELINE</span>
+                    </div>
 
                 </div>
 
 
-                <div class="analysis-card">
+                <!-- SIGNAL CARD -->
+                <div class="analysis-card cyber-signals-card">
 
-                    <span class="eyebrow">
-                        SIGNALS
-                    </span>
-
-                    <h3>
-                        Detection factors
-                    </h3>
-
-                    <div class="signal-bars">
-
+                    <div class="cyber-signals-heading">
                         <div>
-                            <span>Amount</span>
-                            <div class="mini-bar">
-                                <i style="width: 78%"></i>
+                            <span class="cyber-label">SIGNALS</span>
+
+                            <h3>Detection signals</h3>
+
+                            <p>
+                                Information evaluated for this transaction.
+                            </p>
+                        </div>
+                    </div>
+
+
+                    <div class="cyber-signal-grid">
+
+                        <div class="cyber-signal-card">
+                            <div class="cyber-signal-icon lime-icon">₹</div>
+
+                            <div class="cyber-signal-content">
+                                <span class="cyber-signal-name">AMOUNT</span>
+                                <strong id="amountSignal" class="cyber-signal-value">
+                                    Awaiting analysis
+                                </strong>
+                                <span class="cyber-signal-meta">
+                                    Transaction size
+                                </span>
                             </div>
                         </div>
 
-                        <div>
-                            <span>Frequency</span>
-                            <div class="mini-bar">
-                                <i style="width: 62%"></i>
+
+                        <div class="cyber-signal-card">
+                            <div class="cyber-signal-icon purple-icon">↗</div>
+
+                            <div class="cyber-signal-content">
+                                <span class="cyber-signal-name">FREQUENCY</span>
+                                <strong id="frequencySignal" class="cyber-signal-value">
+                                    Pattern checked
+                                </strong>
+                                <span class="cyber-signal-meta">
+                                    Activity context
+                                </span>
                             </div>
                         </div>
 
-                        <div>
-                            <span>Location</span>
-                            <div class="mini-bar">
-                                <i style="width: 48%"></i>
+
+                        <div class="cyber-signal-card">
+                            <div class="cyber-signal-icon blue-icon">◎</div>
+
+                            <div class="cyber-signal-content">
+                                <span class="cyber-signal-name">LOCATION</span>
+                                <strong id="locationSignal" class="cyber-signal-value">
+                                    Not provided
+                                </strong>
+                                <span class="cyber-signal-meta">
+                                    Location context
+                                </span>
                             </div>
                         </div>
 
-                        <div>
-                            <span>Merchant</span>
-                            <div class="mini-bar">
-                                <i style="width: 71%"></i>
+
+                        <div class="cyber-signal-card">
+                            <div class="cyber-signal-icon coral-icon">◈</div>
+
+                            <div class="cyber-signal-content">
+                                <span class="cyber-signal-name">MERCHANT</span>
+                                <strong id="merchantSignal" class="cyber-signal-value">
+                                    Awaiting analysis
+                                </strong>
+                                <span class="cyber-signal-meta">
+                                    Merchant context
+                                </span>
                             </div>
                         </div>
 
                     </div>
 
+                </div>
+
+            </div>
+
+
+            <div class="cyber-analysis-note">
+
+                <div class="cyber-note-icon">i</div>
+
+                <div>
+                    <strong>How to read this panel</strong>
+
+                    <p>
+                        These cards show transaction context supplied to
+                        CyberShield. The ML fraud score is reported separately
+                        from these contextual signals.
+                    </p>
                 </div>
 
             </div>
@@ -763,7 +874,7 @@
 </div>
 
 
-<script src="app.js"></script>
+<script src="/frontend/app.js"></script>
 
 </body>
 </html>

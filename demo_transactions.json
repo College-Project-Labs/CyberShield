@@ -1,0 +1,62 @@
+[
+  {
+    "merchant_id": "MER-1001",
+    "amount": 250,
+    "merchant_type": "Retail",
+    "location": "Indore"
+  },
+  {
+    "merchant_id": "MER-2045",
+    "amount": 1850,
+    "merchant_type": "Electronics",
+    "location": "Mumbai"
+  },
+  {
+    "merchant_id": "MER-3092",
+    "amount": 75,
+    "merchant_type": "Food",
+    "location": "Indore"
+  },
+  {
+    "merchant_id": "MER-4410",
+    "amount": 3500,
+    "merchant_type": "Digital Services",
+    "location": "Delhi"
+  },
+  {
+    "merchant_id": "MER-5521",
+    "amount": 600,
+    "merchant_type": "Travel",
+    "location": "Bhopal"
+  },
+  {
+    "merchant_id": "MER-6632",
+    "amount": 120,
+    "merchant_type": "Retail",
+    "location": "Indore"
+  },
+  {
+    "merchant_id": "MER-7743",
+    "amount": 4200,
+    "merchant_type": "Electronics",
+    "location": "Dubai"
+  },
+  {
+    "merchant_id": "MER-8854",
+    "amount": 320,
+    "merchant_type": "Food",
+    "location": "Mumbai"
+  },
+  {
+    "merchant_id": "MER-9965",
+    "amount": 2100,
+    "merchant_type": "Digital Services",
+    "location": "Unknown"
+  },
+  {
+    "merchant_id": "MER-1076",
+    "amount": 450,
+    "merchant_type": "Retail",
+    "location": "Indore"
+  }
+]

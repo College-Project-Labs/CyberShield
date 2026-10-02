@@ -1,122 +1,48 @@
 /* =========================================================
-   CYBERSHIELD FRONTEND
+   CYBERSHIELD — REAL FRONTEND
    ========================================================= */
 
+const API_URL = "http://127.0.0.1:8000";
 
-/* =========================================================
-   SAMPLE TRANSACTIONS
-   ========================================================= */
+console.log("CyberShield: CLEAN app.js loaded");
 
-const transactions = [
-    {
-        merchant: "MER-1048",
-        type: "Retail",
-        amount: 250.00,
-        risk: 0.08,
-        status: "SAFE"
-    },
-
-    {
-        merchant: "MER-7731",
-        type: "Electronics",
-        amount: 1840.50,
-        risk: 0.71,
-        status: "REVIEW"
-    },
-
-    {
-        merchant: "MER-2904",
-        type: "Food & Dining",
-        amount: 74.25,
-        risk: 0.03,
-        status: "SAFE"
-    },
-
-    {
-        merchant: "MER-5518",
-        type: "Digital Services",
-        amount: 2190.00,
-        risk: 0.91,
-        status: "HIGH RISK"
-    },
-
-    {
-        merchant: "MER-6112",
-        type: "Travel",
-        amount: 485.90,
-        risk: 0.19,
-        status: "SAFE"
-    }
-];
+let transactions = [];
+let lastAnalysis = null;
 
 
 /* =========================================================
    DOM
    ========================================================= */
 
-const form =
-    document.getElementById("transactionForm");
-
-const amountInput =
-    document.getElementById("amount");
-
-const merchantInput =
-    document.getElementById("merchantId");
-
-const locationInput =
-    document.getElementById("location");
-
-const merchantType =
-    document.getElementById("merchantType");
+// DOM-dependent elements are initialized after DOMContentLoaded.
 
 
 /* =========================================================
-   NAVIGATION
+   HELPERS
    ========================================================= */
 
-const navItems =
-    document.querySelectorAll(".nav-item");
-
-const sections =
-    document.querySelectorAll(".page-section");
+function $(id) {
+    return document.getElementById(id);
+}
 
 
-navItems.forEach(item => {
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
 
-    item.addEventListener("click", () => {
 
-        const target =
-            item.dataset.section;
-
-        navItems.forEach(nav => {
-            nav.classList.remove("active");
-        });
-
-        item.classList.add("active");
-
-        sections.forEach(section => {
-            section.classList.remove("active-section");
-        });
-
-        const targetSection =
-            document.getElementById(target);
-
-        if (targetSection) {
-            targetSection.classList.add("active-section");
-        }
-
-        if (target === "transactions") {
-            renderFullTransactions();
-        }
-
+function formatMoney(value) {
+    return Number(value || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
+}
 
-});
-
-
-/* =========================================================
-   TRANSACTION TABLE
-   ========================================================= */
 
 function getRiskClass(risk) {
 
@@ -124,7 +50,7 @@ function getRiskClass(risk) {
         return "risk-danger";
     }
 
-    if (risk >= 0.4) {
+    if (risk >= 0.40) {
         return "risk-review";
     }
 
@@ -146,16 +72,222 @@ function getStatusClass(status) {
 }
 
 
+function normalizeTransaction(transaction) {
+
+    const score = Number(
+        transaction.risk_score ??
+        transaction.risk ??
+        0
+    );
+
+    const band =
+        transaction.risk_band ??
+        transaction.status ??
+        "normal";
+
+    let status = "SAFE";
+
+    if (
+        band === "suspicious" ||
+        band === "fraud" ||
+        band === "HIGH RISK"
+    ) {
+        status = "HIGH RISK";
+    }
+
+    else if (
+        band === "review" ||
+        band === "REVIEW"
+    ) {
+        status = "REVIEW";
+    }
+
+    return {
+        id: transaction.id,
+
+        merchant:
+            transaction.merchant_id ??
+            "Unknown",
+
+        amount:
+            Number(transaction.amount ?? 0),
+
+        risk:
+            score,
+
+        status:
+            status,
+
+        type:
+            transaction.raw_payload?.merchant_type ??
+            transaction.raw_payload?.merchantType ??
+            "Transaction",
+
+        location:
+            transaction.raw_payload?.location ??
+            "Not provided",
+
+        timestamp:
+            transaction.timestamp ??
+            transaction.created_at ??
+            null,
+
+        explanation:
+            transaction.explanation ??
+            "Transaction analyzed by CyberShield.",
+
+        report:
+            transaction.report ??
+            {}
+    };
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function initializeNavigation() {
+
+    const navItems =
+        document.querySelectorAll(".nav-item");
+
+    const sections =
+        document.querySelectorAll(".page-section");
+
+
+    navItems.forEach(item => {
+
+        item.addEventListener("click", event => {
+
+            event.preventDefault();
+
+            const target =
+                item.dataset.section;
+
+            navItems.forEach(nav => {
+                nav.classList.remove("active");
+            });
+
+            item.classList.add("active");
+
+            sections.forEach(section => {
+                section.classList.remove(
+                    "active-section"
+                );
+            });
+
+            const targetSection =
+                $(target);
+
+            if (targetSection) {
+                targetSection.classList.add(
+                    "active-section"
+                );
+            }
+
+            if (target === "transactions") {
+                renderFullTransactions();
+            }
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   LOAD REAL TRANSACTIONS
+   ========================================================= */
+
+async function loadTransactions() {
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/transactions`,
+                {
+                    cache: "no-store"
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                `API error: ${response.status}`
+            );
+        }
+
+        const data =
+            await response.json();
+
+        transactions =
+            data.map(normalizeTransaction);
+
+        renderTransactions();
+        renderFullTransactions();
+        updateDashboardStats();
+
+        console.log(
+            "CyberShield transactions loaded:",
+            transactions.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Could not load transactions:",
+            error
+        );
+
+        transactions = [];
+
+        renderTransactions();
+        renderFullTransactions();
+        updateDashboardStats();
+    }
+}
+
+
+/* =========================================================
+   TRANSACTION TABLE
+   ========================================================= */
+
 function renderTransactions() {
 
     const container =
-        document.getElementById("transactionRows");
+        $("transactionRows");
+
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = "";
 
-    transactions
-        .slice(0, 5)
-        .forEach(transaction => {
+    const visibleTransactions =
+        transactions.slice(0, 5);
+
+    if (visibleTransactions.length === 0) {
+
+        container.innerHTML = `
+            <div style="
+                padding: 24px;
+                text-align: center;
+                opacity: 0.65;
+            ">
+                No transactions analyzed yet.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    visibleTransactions.forEach(
+        transaction => {
 
             const row =
                 document.createElement("div");
@@ -168,46 +300,53 @@ function renderTransactions() {
                 <div class="merchant-cell">
 
                     <strong>
-                        ${transaction.merchant}
+                        ${escapeHtml(
+                            transaction.merchant
+                        )}
                     </strong>
 
                     <span>
-                        ${transaction.type}
+                        ${escapeHtml(
+                            transaction.type
+                        )}
                     </span>
 
                 </div>
 
                 <span>
-                    $${transaction.amount.toLocaleString(
-                        "en-US",
-                        {
-                            minimumFractionDigits: 2
-                        }
+                    $${formatMoney(
+                        transaction.amount
                     )}
                 </span>
 
                 <span
                     class="risk-number
-                    ${getRiskClass(transaction.risk)}"
+                    ${getRiskClass(
+                        transaction.risk
+                    )}"
                 >
-                    ${Math.round(transaction.risk * 100)}%
+                    ${Math.round(
+                        transaction.risk * 100
+                    )}%
                 </span>
 
                 <span>
+
                     <span
                         class="status-pill
-                        ${getStatusClass(transaction.status)}"
+                        ${getStatusClass(
+                            transaction.status
+                        )}"
                     >
                         ${transaction.status}
                     </span>
-                </span>
 
+                </span>
             `;
 
             container.appendChild(row);
-
-        });
-
+        }
+    );
 }
 
 
@@ -218,7 +357,11 @@ function renderTransactions() {
 function renderFullTransactions() {
 
     const container =
-        document.getElementById("fullTransactions");
+        $("fullTransactions");
+
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = `
 
@@ -228,494 +371,385 @@ function renderFullTransactions() {
             <span>Amount</span>
             <span>Risk</span>
         </div>
-
     `;
 
-    transactions.forEach(transaction => {
 
-        const row =
-            document.createElement("div");
+    if (transactions.length === 0) {
 
-        row.className =
-            "transaction-row";
-
-        row.innerHTML = `
-
-            <div class="merchant-cell">
-
-                <strong>
-                    ${transaction.merchant}
-                </strong>
-
-                <span>
-                    Transaction ID
-                </span>
-
+        container.innerHTML += `
+            <div style="
+                padding: 30px;
+                text-align: center;
+                opacity: 0.65;
+            ">
+                No real transactions in database.
             </div>
-
-            <span>
-                ${transaction.type}
-            </span>
-
-            <span>
-                $${transaction.amount.toLocaleString(
-                    "en-US",
-                    {
-                        minimumFractionDigits: 2
-                    }
-                )}
-            </span>
-
-            <span
-                class="risk-number
-                ${getRiskClass(transaction.risk)}"
-            >
-                ${Math.round(transaction.risk * 100)}%
-            </span>
-
         `;
 
-        container.appendChild(row);
+        return;
+    }
 
-    });
 
+    transactions.forEach(
+        transaction => {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "transaction-row";
+
+            row.innerHTML = `
+
+                <div class="merchant-cell">
+
+                    <strong>
+                        ${escapeHtml(
+                            transaction.merchant
+                        )}
+                    </strong>
+
+                    <span>
+                        ${escapeHtml(
+                            transaction.id ||
+                            "Transaction"
+                        )}
+                    </span>
+
+                </div>
+
+                <span>
+                    ${escapeHtml(
+                        transaction.type
+                    )}
+                </span>
+
+                <span>
+                    $${formatMoney(
+                        transaction.amount
+                    )}
+                </span>
+
+                <span
+                    class="risk-number
+                    ${getRiskClass(
+                        transaction.risk
+                    )}"
+                >
+                    ${Math.round(
+                        transaction.risk * 100
+                    )}%
+                </span>
+            `;
+
+            container.appendChild(row);
+        }
+    );
 }
 
 
 /* =========================================================
-   TRANSACTION ANALYSIS
+   REAL TRANSACTION ANALYSIS
    ========================================================= */
 
-form.addEventListener(
-    "submit",
-    async event => {
+function initializeTransactionForm() {
 
-        event.preventDefault();
+    const form =
+        document.getElementById("transactionForm");
 
-        const merchantId =
-            merchantInput.value.trim();
+    const amountInput =
+        document.getElementById("amount");
 
-        const amount =
-            Number(amountInput.value);
+    const merchantInput =
+        document.getElementById("merchantId");
 
-        const location =
-            locationInput.value.trim();
+    const locationInput =
+        document.getElementById("location");
 
-        const type =
-            merchantType.value;
-
-
-        if (!merchantId || !amount) {
-            return;
-        }
+    const merchantType =
+        document.getElementById("merchantType");
 
 
-        /*
-         * -----------------------------------------------
-         * BACKEND CONNECTION
-         * -----------------------------------------------
-         *
-         * When your FastAPI endpoint is ready, replace
-         * the simulated result below with:
-         *
-         * fetch("http://127.0.0.1:8000/predict", ...)
-         *
-         * or whichever endpoint your backend exposes.
-         */
+    if (!form) {
 
-        showAnalyzingState();
+        console.error(
+            "CyberShield: transactionForm not found."
+        );
+
+        return;
+    }
 
 
-        try {
+    /*
+       IMPORTANT:
+       The analyzer button is type="button", not "submit".
+       This prevents the browser from navigating/reloading.
 
-            /*
-             * SIMULATION
-             *
-             * This keeps the frontend working before the
-             * FastAPI backend is connected.
-             */
+       We manually dispatch the submit event so the existing
+       real FastAPI analysis handler runs.
+    */
 
-            await delay(850);
+    const analyzeButton =
+        form.querySelector(".analyze-button");
 
-            const result =
-                simulateFraudDetection(
-                    amount,
-                    type,
-                    location
+
+    if (analyzeButton) {
+
+        analyzeButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                form.dispatchEvent(
+                    new Event("submit", {
+                        bubbles: true,
+                        cancelable: true
+                    })
                 );
 
-            displayResult(result);
-
-
-        } catch (error) {
-
-            console.error(error);
-
-            displayError();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SIMULATED MODEL
-   ========================================================= */
-
-function simulateFraudDetection(
-    amount,
-    type,
-    location
-) {
-
-    let score = 0.04;
-
-
-    /*
-     * Amount signal
-     */
-
-    if (amount > 2000) {
-        score += 0.55;
-    }
-
-    else if (amount > 1000) {
-        score += 0.28;
-    }
-
-    else if (amount > 500) {
-        score += 0.12;
-    }
-
-
-    /*
-     * Merchant signal
-     */
-
-    if (type === "electronics") {
-        score += 0.12;
-    }
-
-    if (type === "digital") {
-        score += 0.10;
-    }
-
-
-    /*
-     * Location signal
-     */
-
-    if (
-        location.toLowerCase().includes("unknown") ||
-        location.toLowerCase().includes("international")
-    ) {
-        score += 0.20;
-    }
-
-
-    /*
-     * Keep between 0 and 1
-     */
-
-    score =
-        Math.min(
-            Math.max(score, 0.01),
-            0.99
+            }
         );
 
-
-    let status;
-
-    if (score >= 0.75) {
-        status = "HIGH RISK";
-    }
-
-    else if (score >= 0.40) {
-        status = "REVIEW";
-    }
-
-    else {
-        status = "SAFE";
     }
 
 
-    let explanation;
+    form.addEventListener(
+        "submit",
+        async function(event) {
 
-    if (status === "HIGH RISK") {
+            /* -----------------------------------------
+               STOP NORMAL FORM SUBMISSION
+               ----------------------------------------- */
 
-        explanation =
-            "The transaction shows a combination of elevated amount and behavioral signals that differ from the expected transaction pattern.";
+            event.preventDefault();
+            event.stopPropagation();
 
-    }
 
-    else if (status === "REVIEW") {
+            /* -----------------------------------------
+               READ INPUTS
+               ----------------------------------------- */
 
-        explanation =
-            "Some transaction characteristics are unusual. The transaction should be reviewed before being cleared.";
+            const merchantId =
+                merchantInput?.value.trim() || "";
 
-    }
+            const amount =
+                Number(
+                    amountInput?.value || 0
+                );
 
-    else {
+            const location =
+                locationInput?.value.trim() || "";
 
-        explanation =
-            "The transaction falls within the expected behavioral range and no major fraud indicators were detected.";
+            const type =
+                merchantType?.value || "";
 
-    }
 
+            /* -----------------------------------------
+               VALIDATION
+               ----------------------------------------- */
 
-    return {
+            if (
+                !merchantId ||
+                !amount ||
+                amount <= 0
+            ) {
 
-        score,
-        status,
-        explanation,
+                alert(
+                    "Please enter a valid Merchant ID and Amount."
+                );
 
-        signals: {
+                return;
+            }
 
-            amount:
-                amount > 1000
-                    ? "Elevated"
-                    : "Normal",
 
-            merchant:
-                type === "electronics" ||
-                type === "digital"
-                    ? "Watch"
-                    : "Normal",
+            /* -----------------------------------------
+               SHOW PROCESSING
+               ----------------------------------------- */
 
-            location:
-                location.toLowerCase().includes("unknown")
-                    ? "Unusual"
-                    : "Normal"
+            showAnalyzingState();
 
-        }
 
-    };
+            try {
 
-}
+                console.log(
+                    "Sending transaction to CyberShield API..."
+                );
 
 
-/* =========================================================
-   DISPLAY RESULT
-   ========================================================= */
+                /* -------------------------------------
+                   CALL FASTAPI
+                   ------------------------------------- */
 
-function displayResult(result) {
+                const response =
+                    await fetch(
+                        `${API_URL}/transaction`,
+                        {
+                            method: "POST",
 
-    const score =
-        Math.round(result.score * 100);
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
 
+                            body:
+                                JSON.stringify({
 
-    const scoreElement =
-        document.getElementById(
-            "transactionScore"
-        );
+                                    merchant_id:
+                                        merchantId,
 
-    const statusElement =
-        document.getElementById(
-            "transactionStatus"
-        );
+                                    amount:
+                                        amount,
 
-    const titleElement =
-        document.getElementById(
-            "resultTitle"
-        );
+                                    timestamp:
+                                        new Date()
+                                            .toISOString(),
 
-    const badgeElement =
-        document.getElementById(
-            "resultBadge"
-        );
+                                    raw_payload: {
 
-    const explanationElement =
-        document.getElementById(
-            "explanation"
-        );
+                                        location:
+                                            location,
 
+                                        merchant_type:
+                                            type
+                                    }
+                                })
+                        }
+                    );
 
-    scoreElement.textContent =
-        `${score}%`;
 
-    statusElement.textContent =
-        result.status;
+                /* -------------------------------------
+                   READ RESPONSE
+                   ------------------------------------- */
 
-    titleElement.textContent =
-        result.status === "HIGH RISK"
-            ? "Transaction flagged"
-            : result.status === "REVIEW"
-                ? "Review recommended"
-                : "Transaction looks safe";
+                const responseText =
+                    await response.text();
 
-    explanationElement.textContent =
-        result.explanation;
 
+                if (!response.ok) {
 
-    /*
-     * Badge
-     */
+                    throw new Error(
+                        `API ${response.status}: ${responseText}`
+                    );
+                }
 
-    badgeElement.className =
-        "result-badge";
 
+                let data;
 
-    if (result.status === "HIGH RISK") {
+                try {
 
-        badgeElement.classList.add("danger");
+                    data =
+                        JSON.parse(
+                            responseText
+                        );
 
-        badgeElement.textContent =
-            "HIGH RISK";
+                }
 
-    }
+                catch {
 
-    else if (result.status === "REVIEW") {
+                    throw new Error(
+                        "FastAPI returned invalid JSON."
+                    );
+                }
 
-        badgeElement.classList.add("review");
 
-        badgeElement.textContent =
-            "REVIEW";
+                console.log(
+                    "REAL CYBERSHIELD RESPONSE:",
+                    data
+                );
 
-    }
 
-    else {
+                /* -------------------------------------
+                   NORMALIZE RESULT
+                   ------------------------------------- */
 
-        badgeElement.classList.add("safe");
+                const result =
+                    normalizeTransaction(data);
 
-        badgeElement.textContent =
-            "SAFE";
 
-    }
+                /* -------------------------------------
+                   SAVE ANALYSIS
+                   ------------------------------------- */
 
+                lastAnalysis = {
 
-    /*
-     * Signals
-     */
+                    ...result,
 
-    document.getElementById(
-        "amountSignal"
-    ).textContent =
-        result.signals.amount;
+                    report:
+                        data.report || {},
 
+                    input: {
 
-    document.getElementById(
-        "merchantSignal"
-    ).textContent =
-        result.signals.merchant;
+                        merchantId:
+                            merchantId,
 
+                        amount:
+                            amount,
 
-    document.getElementById(
-        "locationSignal"
-    ).textContent =
-        result.signals.location;
+                        location:
+                            location,
 
+                        type:
+                            type
+                    },
 
-    /*
-     * Add to recent transactions
-     */
+                    analyzedAt:
+                        new Date().toISOString()
+                };
 
-    transactions.unshift({
 
-        merchant:
-            merchantInput.value,
+                /* -------------------------------------
+                   DISPLAY RESULT
+                   ------------------------------------- */
 
-        type:
-            merchantType.options[
-                merchantType.selectedIndex
-            ].text,
+                displayResult(
+                    lastAnalysis
+                );
 
-        amount:
-            Number(amountInput.value),
 
-        risk:
-            result.score,
+                /* -------------------------------------
+                   REFRESH DATABASE DATA ONLY
+                   ------------------------------------- */
 
-        status:
-            result.status
+                await loadTransactions();
 
-    });
 
+                /* -------------------------------------
+                   KEEP RESULT ON SCREEN
+                   ------------------------------------- */
 
-    renderTransactions();
+                displayResult(
+                    lastAnalysis
+                );
 
 
-    /*
-     * Update dashboard counters
-     */
+                console.log(
+                    "CyberShield analysis displayed successfully."
+                );
 
-    updateDashboard(result);
+            }
 
-}
 
+            catch (error) {
 
-/* =========================================================
-   DASHBOARD UPDATE
-   ========================================================= */
+                console.error(
+                    "CyberShield analysis error:",
+                    error
+                );
 
-function updateDashboard(result) {
+                displayError(
+                    error.message
+                );
+            }
 
-    const score =
-        Math.round(result.score * 100);
+        },
 
+        false
+    );
 
-    const globalRisk =
-        document.getElementById(
-            "globalRisk"
-        );
-
-    const globalRiskBar =
-        document.getElementById(
-            "globalRiskBar"
-        );
-
-    const riskLabel =
-        document.getElementById(
-            "riskLabel"
-        );
-
-
-    globalRisk.textContent =
-        score;
-
-
-    globalRiskBar.style.width =
-        `${score}%`;
-
-
-    if (score >= 75) {
-
-        riskLabel.textContent =
-            "High";
-
-        globalRiskBar.style.background =
-            "var(--coral)";
-
-        riskLabel.style.color =
-            "var(--coral)";
-
-    }
-
-    else if (score >= 40) {
-
-        riskLabel.textContent =
-            "Moderate";
-
-        globalRiskBar.style.background =
-            "var(--blue)";
-
-        riskLabel.style.color =
-            "var(--blue)";
-
-    }
-
-    else {
-
-        riskLabel.textContent =
-            "Low";
-
-        globalRiskBar.style.background =
-            "var(--lime)";
-
-        riskLabel.style.color =
-            "var(--lime)";
-
-    }
+    console.log(
+        "CyberShield: transaction form handler attached."
+    );
 
 }
 
@@ -726,121 +760,741 @@ function updateDashboard(result) {
 
 function showAnalyzingState() {
 
-    document.getElementById(
-        "resultTitle"
-    ).textContent =
-        "Analyzing transaction";
+    if ($("resultTitle")) {
+
+        $("resultTitle").textContent =
+            "Analyzing transaction";
+    }
 
 
-    document.getElementById(
-        "resultBadge"
-    ).className =
-        "result-badge neutral";
+    if ($("resultBadge")) {
+
+        $("resultBadge").className =
+            "result-badge neutral";
+
+        $("resultBadge").textContent =
+            "PROCESSING";
+    }
 
 
-    document.getElementById(
-        "resultBadge"
-    ).textContent =
-        "PROCESSING";
+    if ($("transactionScore")) {
+
+        $("transactionScore").textContent =
+            "…";
+    }
 
 
-    document.getElementById(
-        "transactionScore"
-    ).textContent =
-        "…";
+    if ($("transactionStatus")) {
+
+        $("transactionStatus").textContent =
+            "Running detection model";
+    }
 
 
-    document.getElementById(
-        "transactionStatus"
-    ).textContent =
-        "Running detection model";
+    if ($("explanation")) {
 
-
-    document.getElementById(
-        "explanation"
-    ).textContent =
-        "CyberShield is evaluating the transaction against its detection signals.";
-
+        $("explanation").textContent =
+            "CyberShield is evaluating the transaction through the detection pipeline.";
+    }
 }
 
 
 /* =========================================================
-   ERROR STATE
+   DISPLAY RESULT
    ========================================================= */
 
-function displayError() {
+function displayResult(result) {
 
-    document.getElementById(
-        "resultTitle"
-    ).textContent =
-        "Analysis failed";
-
-
-    document.getElementById(
-        "resultBadge"
-    ).textContent =
-        "ERROR";
+    const score =
+        Math.round(
+            Number(
+                result.risk || 0
+            ) * 100
+        );
 
 
-    document.getElementById(
-        "transactionScore"
-    ).textContent =
-        "—";
+    /* -----------------------------------------
+       SCORE
+       ----------------------------------------- */
+
+    if ($("transactionScore")) {
+
+        $("transactionScore").textContent =
+            `${score}%`;
+    }
 
 
-    document.getElementById(
-        "transactionStatus"
-    ).textContent =
-        "Unable to analyze";
+    /* -----------------------------------------
+       STATUS
+       ----------------------------------------- */
+
+    if ($("transactionStatus")) {
+
+        $("transactionStatus").textContent =
+            result.status;
+    }
 
 
-    document.getElementById(
-        "explanation"
-    ).textContent =
-        "The detection service could not process this transaction. Check that the CyberShield API is running.";
+    /* -----------------------------------------
+       TITLE
+       ----------------------------------------- */
 
+    if ($("resultTitle")) {
+
+        $("resultTitle").textContent =
+
+            result.status === "HIGH RISK"
+
+                ? "Transaction flagged"
+
+                : result.status === "REVIEW"
+
+                    ? "Review recommended"
+
+                    : "Transaction analyzed";
+    }
+
+
+    /* -----------------------------------------
+       BADGE
+       ----------------------------------------- */
+
+    if ($("resultBadge")) {
+
+        const badge =
+            $("resultBadge");
+
+        badge.className =
+            "result-badge";
+
+
+        if (
+            result.status ===
+            "HIGH RISK"
+        ) {
+
+            badge.classList.add(
+                "danger"
+            );
+
+            badge.textContent =
+                "HIGH RISK";
+        }
+
+
+        else if (
+            result.status ===
+            "REVIEW"
+        ) {
+
+            badge.classList.add(
+                "review"
+            );
+
+            badge.textContent =
+                "REVIEW";
+        }
+
+
+        else {
+
+            badge.classList.add(
+                "safe"
+            );
+
+            badge.textContent =
+                "SAFE";
+        }
+    }
+
+
+    /* -----------------------------------------
+       EXPLANATION / AI REPORT
+       ----------------------------------------- */
+
+    if ($("explanation")) {
+
+        const reportReason =
+            result.report?.reason;
+
+        $("explanation").textContent =
+
+            reportReason ||
+
+            result.explanation ||
+
+            "Transaction analyzed by CyberShield.";
+    }
+
+
+    /* -----------------------------------------
+       SIGNALS
+       ----------------------------------------- */
+
+    if ($("resultAmountSignal")) {
+
+        $("resultAmountSignal").textContent =
+            result.amount > 1000
+                ? "Elevated"
+                : "Normal";
+    }
+
+
+    if ($("resultMerchantSignal")) {
+
+        $("resultMerchantSignal").textContent =
+            result.type ||
+            "Analyzed";
+    }
+
+
+    if ($("resultLocationSignal")) {
+
+        $("resultLocationSignal").textContent =
+
+            result.location &&
+            result.location !==
+                "Not provided"
+
+                ? "Checked"
+
+                : "Not provided";
+    }
+
+
+    /* -----------------------------------------
+       ANALYSIS TAB CONTEXT CARDS
+       ----------------------------------------- */
+
+    if ($("amountSignal")) {
+        $("amountSignal").textContent =
+            result.amount > 1000 ? "Elevated" : "Normal";
+    }
+
+    if ($("merchantSignal")) {
+        $("merchantSignal").textContent =
+            result.type || "Analyzed";
+    }
+
+    if ($("locationSignal")) {
+        $("locationSignal").textContent =
+            result.location && result.location !== "Not provided"
+                ? result.location
+                : "Not provided";
+    }
+
+    if ($("frequencySignal")) {
+        $("frequencySignal").textContent = "Pattern checked";
+    }
+
+
+    /* -----------------------------------------
+       REPORT DOWNLOAD
+       ----------------------------------------- */
+
+    addReportButton();
 }
 
 
 /* =========================================================
-   HELPERS
+   ERROR
    ========================================================= */
 
-function delay(ms) {
+function displayError(message) {
 
-    return new Promise(
-        resolve => setTimeout(resolve, ms)
+    if ($("resultTitle")) {
+
+        $("resultTitle").textContent =
+            "Analysis failed";
+    }
+
+
+    if ($("resultBadge")) {
+
+        $("resultBadge").className =
+            "result-badge danger";
+
+        $("resultBadge").textContent =
+            "ERROR";
+    }
+
+
+    if ($("transactionScore")) {
+
+        $("transactionScore").textContent =
+            "—";
+    }
+
+
+    if ($("transactionStatus")) {
+
+        $("transactionStatus").textContent =
+            "Unable to analyze";
+    }
+
+
+    if ($("explanation")) {
+
+        $("explanation").textContent =
+            `CyberShield API error: ${message}`;
+    }
+}
+
+
+/* =========================================================
+   REAL DASHBOARD STATS
+   ========================================================= */
+
+function updateDashboardStats() {
+
+    const total =
+        transactions.length;
+
+
+    const flagged =
+        transactions.filter(
+            transaction =>
+
+                transaction.status ===
+                    "HIGH RISK" ||
+
+                transaction.status ===
+                    "REVIEW"
+        ).length;
+
+
+    const highRisk =
+        transactions.filter(
+            transaction =>
+
+                transaction.status ===
+                "HIGH RISK"
+        ).length;
+
+
+    const risks =
+        transactions
+
+            .map(
+                transaction =>
+                    Number(
+                        transaction.risk
+                    )
+            )
+
+            .filter(
+                value =>
+                    Number.isFinite(value)
+            );
+
+
+    const averageRisk =
+        risks.length
+
+            ? Math.round(
+                (
+                    risks.reduce(
+                        (a, b) =>
+                            a + b,
+                        0
+                    ) / risks.length
+                ) * 100
+            )
+
+            : 0;
+
+
+    /* -----------------------------------------
+       UPDATE OLD DASHBOARD NUMBERS
+       ----------------------------------------- */
+
+    updateMockupNumber(
+        "1,284",
+        total.toLocaleString()
     );
 
+
+    updateMockupNumber(
+        "42",
+        flagged.toString()
+    );
+
+
+    updateMockupNumber(
+        "08",
+        String(
+            highRisk
+        ).padStart(2, "0")
+    );
+
+
+    updateMockupNumber(
+        "97.8%",
+        risks.length
+            ? `${averageRisk}%`
+            : "—"
+    );
+
+
+    /* -----------------------------------------
+       GLOBAL RISK
+       ----------------------------------------- */
+
+    if ($("globalRisk")) {
+
+        $("globalRisk").textContent =
+            averageRisk;
+    }
+
+
+    if ($("globalRiskBar")) {
+
+        $("globalRiskBar").style.width =
+            `${averageRisk}%`;
+    }
+
+
+    if ($("riskLabel")) {
+
+        $("riskLabel").textContent =
+
+            averageRisk >= 75
+
+                ? "High"
+
+                : averageRisk >= 40
+
+                    ? "Moderate"
+
+                    : "Low";
+    }
 }
 
+
+/* =========================================================
+   REMOVE OLD MOCK NUMBERS
+   ========================================================= */
+
+function updateMockupNumber(
+    oldValue,
+    newValue
+) {
+
+    const walker =
+        document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT
+        );
+
+
+    const nodes = [];
+
+
+    while (
+        walker.nextNode()
+    ) {
+
+        nodes.push(
+            walker.currentNode
+        );
+    }
+
+
+    nodes.forEach(
+        node => {
+
+            if (
+                node.nodeValue.trim() ===
+                oldValue
+            ) {
+
+                node.nodeValue =
+                    node.nodeValue.replace(
+                        oldValue,
+                        newValue
+                    );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   REPORT DOWNLOAD
+   ========================================================= */
+
+function addReportButton() {
+
+    if (!lastAnalysis) {
+        return;
+    }
+
+
+    const explanation =
+        $("explanation");
+
+
+    if (!explanation) {
+        return;
+    }
+
+
+    let button =
+        $("downloadReportButton");
+
+
+    if (!button) {
+
+        button =
+            document.createElement(
+                "button"
+            );
+
+
+        button.id =
+            "downloadReportButton";
+
+
+        button.type =
+            "button";
+
+
+        button.textContent =
+            "Download Investigation Report";
+
+
+        button.style.marginTop =
+            "18px";
+
+
+        button.style.padding =
+            "12px 18px";
+
+
+        button.style.border =
+            "none";
+
+
+        button.style.borderRadius =
+            "10px";
+
+
+        button.style.cursor =
+            "pointer";
+
+
+        button.style.fontWeight =
+            "700";
+
+
+        explanation.parentElement.appendChild(
+            button
+        );
+    }
+
+
+    button.onclick =
+        downloadReport;
+}
+
+
+/* =========================================================
+   DOWNLOAD REPORT
+   ========================================================= */
+
+function downloadReport() {
+
+    if (!lastAnalysis) {
+        return;
+    }
+
+
+    const report =
+        lastAnalysis.report ||
+        {};
+
+
+    const merchantId =
+        lastAnalysis.merchant ||
+        "transaction";
+
+
+    const score =
+        Math.round(
+            Number(
+                lastAnalysis.risk ||
+                0
+            ) * 100
+        );
+
+
+    const reportText = `CYBERSHIELD INVESTIGATION REPORT
+================================
+
+Transaction ID:
+${lastAnalysis.id || "N/A"}
+
+Merchant ID:
+${merchantId}
+
+Amount:
+₹${Number(
+    lastAnalysis.amount || 0
+).toLocaleString("en-IN")}
+
+Merchant Type:
+${lastAnalysis.type || "N/A"}
+
+Location:
+${lastAnalysis.location || "N/A"}
+
+Fraud Score:
+${score}%
+
+Risk:
+${lastAnalysis.status || "normal"}
+
+ANALYSIS
+--------
+${
+    report.reason ||
+    lastAnalysis.explanation ||
+    "No explanation available."
+}
+
+RECOMMENDATION
+--------------
+${
+    report.recommendation ||
+    "Continue monitoring the transaction."
+}
+
+EVIDENCE
+--------
+${
+    report.evidence ||
+    "ML fraud score and transaction context."
+}
+
+Generated:
+${new Date().toLocaleString("en-IN")}
+
+CyberShield
+`;
+
+
+    const blob =
+        new Blob(
+            [reportText],
+            {
+                type:
+                    "text/plain;charset=utf-8"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        `CyberShield_Report_${merchantId}.txt`;
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+}
+
+
+/* =========================================================
+   NAVIGATION HELPERS
+   ========================================================= */
 
 function scrollToAnalyzer() {
 
-    document.getElementById(
-        "analyzer"
-    ).scrollIntoView({
-        behavior: "smooth"
-    });
+    const analyzer =
+        $("analyzer");
 
+
+    if (analyzer) {
+
+        analyzer.scrollIntoView({
+            behavior: "smooth"
+        });
+    }
 }
 
 
 function showAllTransactions() {
 
-    document
-        .querySelector(
+    const item =
+        document.querySelector(
             '[data-section="transactions"]'
-        )
-        .click();
+        );
 
+
+    if (item) {
+        item.click();
+    }
 }
+
+
+
+/* =========================================================
+   HERO NETWORK PARALLAX
+   ========================================================= */
+
+document.addEventListener("mousemove", event => {
+
+    const network = document.querySelector(".cyber-network");
+
+    if (!network || window.innerWidth < 900) {
+        return;
+    }
+
+    const x = (event.clientX / window.innerWidth - 0.5) * 7;
+    const y = (event.clientY / window.innerHeight - 0.5) * 7;
+
+    network.style.transform =
+        `translateY(-50%) translate(${x}px, ${y}px)`;
+});
 
 
 /* =========================================================
    INITIALIZE
    ========================================================= */
 
-renderTransactions();
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-renderFullTransactions();
+        initializeNavigation();
+        initializeTransactionForm();
+        loadTransactions();
+
+    }
+);
